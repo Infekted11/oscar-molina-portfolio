@@ -246,3 +246,9 @@ main:focus{outline:none}
 }
 @media(max-width:370px){:root{--gutter:52px;--right:52px}}
 @media(max-width:700px) and (max-height:700px){.hero-main{gap:18px}.hero-aside{gap:12px}}
+
+:root[data-theme="dark"]{--red:#20201f;--ink:#fa382b;--line:rgba(250,56,43,.28)}
+.theme-toggle{position:fixed;top:18px;right:18px;z-index:40;min-width:64px;min-height:44px;border:1px solid var(--ink);border-radius:24px;background:var(--red);color:var(--ink);padding:8px 14px;font-size:14px}
+.masthead{padding-right:70px}
+:root[data-theme="dark"] .brand img,:root[data-theme="dark"] .about-symbol img{filter:invert(30%) sepia(100%) saturate(2800%) hue-rotate(345deg) brightness(105%)}
+@media(max-width:700px){.masthead{padding-right:0}.theme-toggle{top:14px;right:10px;min-width:56px;padding:8px 10px}}

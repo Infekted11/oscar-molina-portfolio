@@ -1,3 +1,19 @@
+const themeButton = document.querySelector('.theme-toggle');
+const updateThemeButton = () => {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  themeButton.textContent = dark ? 'Light' : 'Dark';
+  themeButton.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  themeButton.setAttribute('aria-pressed', String(dark));
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#20201f' : '#fa382b';
+};
+themeButton.addEventListener('click', () => {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem('portfolio-theme', theme); } catch {}
+  updateThemeButton();
+});
+updateThemeButton();
+
 const menu = document.querySelector('.side-nav');
 const menuToggle = document.querySelector('.nav-reveal');
 let keyboardNavigation = false;
