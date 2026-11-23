@@ -252,3 +252,7 @@ main:focus{outline:none}
 .masthead{padding-right:70px}
 :root[data-theme="dark"] .brand img,:root[data-theme="dark"] .about-symbol img{filter:invert(30%) sepia(100%) saturate(2800%) hue-rotate(345deg) brightness(105%)}
 @media(max-width:700px){.masthead{padding-right:0}.theme-toggle{top:14px;right:10px;min-width:56px;padding:8px 10px}}
+@media(max-width:700px){
+  .nav-reveal{top:14px;transform:none}
+  .side-nav{top:66px;transform:none}
+}
