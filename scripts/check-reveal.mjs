@@ -8,7 +8,8 @@ function fixture({reduced=false,canvasAvailable=true}={}){
   const ready=new Promise(resolve=>{resolveFonts=resolve;});
   const ctx={setTransform(){},fillRect(){},clearRect:(...rect)=>erased.push(rect)};
   const canvas={getContext:()=>canvasAvailable?ctx:null};
-  const overlay={style:{},querySelector:()=>canvas,remove:()=>{removed=true;}};
+  const message={hidden:false};
+  const overlay={style:{},querySelector:selector=>selector==='canvas'?canvas:message,remove:()=>{removed=true;}};
   const document={readyState:'loading',fonts:{ready},querySelector:()=>overlay,
     documentElement:{classList:{remove(){}}},body:{inert:false,setAttribute(){},removeAttribute(){}}};
   const window={addEventListener:(name,fn)=>{events[name]=fn;},removeEventListener:name=>delete events[name]};
@@ -17,7 +18,7 @@ function fixture({reduced=false,canvasAvailable=true}={}){
     matchMedia:()=>({matches:reduced,addEventListener(){},removeEventListener(){}}),
     requestAnimationFrame:fn=>{frames.set(++id,fn);return id;},cancelAnimationFrame:key=>frames.delete(key),
     setTimeout:(fn,delay)=>{timers.set(++id,{fn,delay});return id;},clearTimeout:key=>timers.delete(key)});
-  return {document,events,frames,timers,erased,get removed(){return removed;},resolveFonts,
+  return {document,events,frames,timers,erased,message,get removed(){return removed;},resolveFonts,
     advance(ms){time=ms;for(const [key,timer] of [...timers]){if(timer.delay<=ms){timers.delete(key);timer.fn();}}},
     step(ms){time=ms;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(ms));}};
 }
@@ -31,7 +32,9 @@ f.resolveFonts();await loaded;
 assert.equal(f.frames.size,0,'Hold after load and fonts');
 assert.equal([...f.timers.values()][0].delay,1000,'Hold lasts one second');
 f.advance(999);assert.equal(f.erased.length,0);assert.equal(f.frames.size,0);
+assert.equal(f.message.hidden,false,'Logo and loading text stay visible during hold');
 f.advance(1000);
+assert.equal(f.message.hidden,true,'Loading message hides as dissolution begins');
 f.step(1450);
 assert.equal(f.erased.length,40,'Half the grid clears at half duration');
 assert.ok(f.erased.every(([x,y,w,h])=>x%10===0&&y%10===0&&w===10&&h===10),'Grid uses solid 10px cells');

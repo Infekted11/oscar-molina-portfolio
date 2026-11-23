@@ -2,6 +2,7 @@
   const overlay = document.querySelector('.load-overlay');
   if (!overlay) return;
   const canvas = overlay.querySelector('canvas');
+  const message = overlay.querySelector('.load-message');
   const ctx = canvas.getContext('2d');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const pixelSize = 10; // Same CSS-pixel grid as the fluid renderer.
@@ -75,6 +76,7 @@
     if (!ctx || reduced.matches) { finish(); return; }
     hold = setTimeout(() => {
       if (done) return;
+      if (message) message.hidden = true;
       startTime = performance.now();
       deadline = setTimeout(finish, 1000);
       frame = requestAnimationFrame(tick);
