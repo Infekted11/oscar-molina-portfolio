@@ -23,6 +23,7 @@ export async function build(directory = 'dist') {
   await writeFile(resolve(out, '.nojekyll'), '');
   const assetVersion = {};
   for (const file of ['style.css', 'app.js']) assetVersion[file] = createHash('sha256').update(await readFile(resolve(out, file))).digest('hex').slice(0, 12);
+  for (const file of ['mark.svg', 'letter-o.svg', 'letter-m.svg']) assetVersion[file] = createHash('sha256').update(await readFile(resolve(out, 'assets', file))).digest('hex').slice(0, 12);
   const pageVersion = createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).update(JSON.stringify(c)).update(JSON.stringify(assetVersion)).digest('hex').slice(0, 12);
 
   function graphic(p, prefix) {
@@ -66,6 +67,7 @@ ${footer('./', true)}`;
     if (p.path === '404') html = html.replace('<head>', `<head><script>const parts=location.pathname.split('/');const base=parts[1]==='oscar-molina-portfolio'?'/oscar-molina-portfolio/':'/';document.write('<base href="'+base+'">');</script>`).replaceAll('../', './');
     // Keep navigation on the same published version, including cached subpages.
     html = html.replace(/href="([^"?#]+\/)(#[^"]*)?"/g, (match, href, hash = '') => /^https?:/.test(href) ? match : `href="${href}?v=${pageVersion}${hash}"`);
+    html = html.replace(/(src|href)="([^"?]+\.svg)"/g, (match, attr, url) => `${attr}="${url}?v=${assetVersion[url.split('/').pop()]}"`);
     await writeFile(file, html);
   }
   console.log(`Built ${pages.length} pages in ${directory}/`);
