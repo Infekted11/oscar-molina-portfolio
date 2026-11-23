@@ -21,7 +21,7 @@ const document = {
   addEventListener: (type, handler) => { handlers[type] = handler; },
   documentElement: { addEventListener: (type, handler) => { handlers[type] = handler; } }
 };
-const source = readFileSync(new URL('../src/app.js', import.meta.url), 'utf8').split('const reel =')[0];
+const source = readFileSync(new URL('../src/app.js', import.meta.url), 'utf8').split('const reel =')[0].slice(readFileSync(new URL('../src/app.js', import.meta.url), 'utf8').indexOf('const menu ='));
 vm.runInNewContext(source, { document, matchMedia: () => ({ matches: tapMode }) });
 
 handlers.pointermove({ pointerType: 'mouse', clientX: 30 });
