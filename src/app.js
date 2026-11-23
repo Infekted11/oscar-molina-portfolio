@@ -62,7 +62,7 @@ if (reel) {
     panels[Math.max(0, Math.min(target, panels.length - 1))].scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
   });
   document.querySelectorAll('.skill').forEach(skill => skill.addEventListener('toggle', () => {
-    if (skill.open) document.querySelectorAll('.skill').forEach(other => { if (other !== skill) other.open = false; });
+    if (skill.open) skill.closest('.skill-list').querySelectorAll('.skill').forEach(other => { if (other !== skill) other.open = false; });
   }));
   update();
 }

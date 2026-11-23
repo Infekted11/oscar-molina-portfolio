@@ -15,6 +15,10 @@ for (const file of htmlFiles) {
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
   if ((markup.match(/<h1[ >]/g) || []).length !== 1) errors.push(`${relative(root, file)}: expected one h1`);
   if (!markup.includes('<html lang="en">')) errors.push(`${file}: missing language`);
+  const panelCount = (markup.match(/data-panel="/g) || []).length;
+  const indicatorCount = (markup.match(/class="panel-dot /g) || []).length;
+  if (!markup.includes('class="reel"') || !panelCount || panelCount !== indicatorCount) errors.push(`${file}: missing snap container or mismatched panel navigation`);
+  if (markup.includes('letter-tile')) errors.push(`${file}: old O/M graphic is still present`);
   for (const mount of ['/', '/oscar-molina-portfolio/']) {
     const pagePath = relative(root, file).replace(/index\.html$/, '');
     const pageURL = new URL(mount + pagePath, 'https://portfolio.test');
