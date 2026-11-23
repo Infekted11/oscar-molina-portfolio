@@ -18,6 +18,7 @@ function fixture({reduced=false,canvasAvailable=true}={}){
     requestAnimationFrame:fn=>{frames.set(++id,fn);return id;},cancelAnimationFrame:key=>frames.delete(key),
     setTimeout:(fn,delay)=>{timers.set(++id,{fn,delay});return id;},clearTimeout:key=>timers.delete(key)});
   return {document,events,frames,timers,erased,get removed(){return removed;},resolveFonts,
+    advance(ms){time=ms;for(const [key,timer] of [...timers]){if(timer.delay<=ms){timers.delete(key);timer.fn();}}},
     step(ms){time=ms;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(ms));}};
 }
 const f=fixture();
@@ -27,23 +28,28 @@ const loaded=f.events.load();
 await Promise.resolve();
 assert.equal(f.frames.size,0,'Wait for fonts after window load');
 f.resolveFonts();await loaded;
-f.step(450);
+assert.equal(f.frames.size,0,'Hold after load and fonts');
+assert.equal([...f.timers.values()][0].delay,1000,'Hold lasts one second');
+f.advance(999);assert.equal(f.erased.length,0);assert.equal(f.frames.size,0);
+f.advance(1000);
+f.step(1450);
 assert.equal(f.erased.length,40,'Half the grid clears at half duration');
 assert.ok(f.erased.every(([x,y,w,h])=>x%10===0&&y%10===0&&w===10&&h===10),'Grid uses solid 10px cells');
 assert.equal(new Set(f.erased.map(([x,y])=>`${x},${y}`)).size,40,'Each random cell clears only once');
 const holes=new Set(f.erased.map(([x,y])=>`${x},${y}`));
 let neighbours=0;for(const [x,y] of f.erased){if(holes.has(`${x+10},${y}`))neighbours++;if(holes.has(`${x},${y+10}`))neighbours++;}
-assert.ok(neighbours>=45,'Pixels disappear in connected clumps rather than scattered noise');
-f.step(900);
+assert.ok(neighbours>=40,'Pixels disappear in connected clumps rather than scattered noise');
+f.step(1900);
 assert.equal(f.erased.length,80);
 assert.equal(f.removed,true,'Reveal finishes before one second');
 assert.equal(f.document.body.inert,false,'Page is interactive after reveal');
 assert.equal(f.frames.size,0);assert.equal(f.timers.size,0);
 const fallback=fixture();fallback.resolveFonts();await fallback.events.load();
+fallback.advance(1000);
 const deadline=[...fallback.timers.values()][0];assert.equal(deadline.delay,1000);
 deadline.fn();assert.equal(fallback.removed,true,'Deadline clears stalled animation');
 for(const options of [{reduced:true},{canvasAvailable:false}]){
   const safe=fixture(options);safe.resolveFonts();await safe.events.load();
   assert.equal(safe.removed,true);assert.equal(safe.frames.size,0);
 }
-console.log('Reveal waits for load/fonts, clears clustered 10px cells within 900ms, and handles reduced motion/fallbacks.');
+console.log('Reveal waits for load/fonts and a one-second hold, clears rough clustered 10px cells within 900ms, and handles reduced motion/fallbacks.');

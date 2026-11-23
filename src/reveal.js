@@ -6,12 +6,14 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const pixelSize = 10; // Same CSS-pixel grid as the fluid renderer.
   const duration = 900;
-  let frame = 0, deadline = 0, startTime = null, cells = [], cleared = 0, columns = 0, done = false;
+  const holdDuration = 1000;
+  let frame = 0, deadline = 0, hold = 0, startTime = null, cells = [], cleared = 0, columns = 0, done = false;
   const finish = () => {
     if (done) return;
     done = true;
     cancelAnimationFrame(frame);
     clearTimeout(deadline);
+    clearTimeout(hold);
     window.removeEventListener('resize', resize);
     reduced.removeEventListener('change', motionChange);
     document.documentElement.classList.remove('js-loading');
@@ -50,10 +52,10 @@
         return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty;
       };
     };
-    const broad = field(8), detail = field(4);
+    const broad = field(8), detail = field(4), grain = field(2);
     const scores = cells.map(cell => {
       const x = cell % columns, y = Math.floor(cell / columns);
-      return broad(x, y) * .8 + detail(x, y) * .2;
+      return broad(x, y) * .68 + detail(x, y) * .16 + grain(x, y) * .08 + Math.random() * .08;
     });
     cells.sort((a, b) => scores[a] - scores[b]);
     cleared = 0;
@@ -71,9 +73,12 @@
   const begin = () => Promise.resolve(document.fonts?.ready).then(() => {
     if (done) return;
     if (!ctx || reduced.matches) { finish(); return; }
-    startTime = performance.now();
-    deadline = setTimeout(finish, 1000);
-    frame = requestAnimationFrame(tick);
+    hold = setTimeout(() => {
+      if (done) return;
+      startTime = performance.now();
+      deadline = setTimeout(finish, 1000);
+      frame = requestAnimationFrame(tick);
+    }, holdDuration);
   });
   document.body.inert = true;
   document.body.setAttribute('aria-busy', 'true');
