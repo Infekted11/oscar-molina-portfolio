@@ -1,7 +1,6 @@
 const themeButton = document.querySelector('.theme-toggle');
 const updateThemeButton = () => {
   const dark = document.documentElement.dataset.theme === 'dark';
-  themeButton.textContent = dark ? 'Light' : 'Dark';
   themeButton.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
   themeButton.setAttribute('aria-pressed', String(dark));
   document.querySelector('meta[name="theme-color"]').content = dark ? '#20201f' : '#fa382b';

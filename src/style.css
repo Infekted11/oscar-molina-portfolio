@@ -256,3 +256,10 @@ main:focus{outline:none}
   .nav-reveal{top:14px;transform:none}
   .side-nav{top:66px;transform:none}
 }
+
+.theme-toggle{width:44px;height:44px;min-width:44px;min-height:44px;padding:12px;border:0;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;touch-action:manipulation}
+.theme-toggle svg{width:20px;height:20px;grid-area:1/1}
+.theme-sun{display:none}
+:root[data-theme="dark"] .theme-moon{display:none}
+:root[data-theme="dark"] .theme-sun{display:block}
+@media(max-width:700px){.theme-toggle{right:12px}}
