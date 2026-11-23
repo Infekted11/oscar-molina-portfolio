@@ -1,0 +1,75 @@
+{
+  "name": "Oscar Molina",
+  "email": "opmolina73@gmail.com",
+  "intro": "I’m Oscar, a student working in photography, graphic design, and CAD. I also design and machine parts with FIRST Robotics Team 3950.",
+  "bio": "I’m a high school student working across photography, video, graphic design, and fabrication. My experience includes robotics, event photography, and stage crew.",
+  "skills": [
+    {
+      "title": "Photography & video",
+      "description": "Photography, videography, video editing, and color grading.",
+      "tools": "DaVinci Resolve · Adobe Lightroom",
+      "short": "Photography, video & color"
+    },
+    {
+      "title": "Graphic design",
+      "description": "Posters, shirts, stickers, business cards, and visual identity.",
+      "tools": "Affinity · Canva",
+      "short": "Graphic design & branding"
+    },
+    {
+      "title": "CAD & fabrication",
+      "description": "3D design, CNC machining, lathe and mill operation, and 3D printing.",
+      "tools": "3D CAD · CNC · 3D printing",
+      "short": "CAD, fabrication & 3D printing"
+    },
+    {
+      "title": "Collaboration",
+      "description": "Teaching new teammates, organizing work, and learning by doing. Spanish conversation, reading, and writing at an upper B2 level.",
+      "tools": "Teamwork · Organization · Spanish",
+      "short": "Teamwork & communication"
+    }
+  ],
+  "experience": [
+    {
+      "title": "FIRST Robotics Team 3950",
+      "role": "Robot design · Media & brand",
+      "description": "Designed and machined parts for two robots over two years, and helped new members learn mechanical design and safe machinery use. Created recruitment and competition posters and photographed team events, demos, and Robo Camp."
+    },
+    {
+      "title": "Stage & sound crew",
+      "role": "Set building · Live production",
+      "description": "Built sets and handled on-stage set changes for seven plays and musicals. Managed the sound system, actor microphones, and sound cues for one play."
+    },
+    {
+      "title": "Scouts of America",
+      "role": "Learning · Community",
+      "description": "Four years with Troop 195, with merit badges in areas including first aid, cooking, graphic arts, emergency preparedness, and entrepreneurship."
+    }
+  ],
+  "projects": [
+    {
+      "slug": "graphic-design",
+      "title": "Graphic design",
+      "category": "Visual identity & print",
+      "kind": "design",
+      "description": "Project selection coming soon.",
+      "summary": "Project details and images coming soon."
+    },
+    {
+      "slug": "photo-and-film",
+      "title": "Photo & film",
+      "category": "Photography & video",
+      "kind": "photo",
+      "description": "Project selection coming soon.",
+      "summary": "Project details and images coming soon."
+    },
+    {
+      "slug": "design-and-build",
+      "title": "Design & build",
+      "category": "CAD & fabrication",
+      "kind": "build",
+      "description": "Project selection coming soon.",
+      "summary": "Project details and images coming soon."
+    }
+  ]
+}

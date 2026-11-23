@@ -1,0 +1,8 @@
+[build]
+  # Publication guard: this draft must remain unpublished.
+  command = "node -e \"console.error('Unpublished portfolio: deployment is disabled.'); process.exit(1)\""
+  publish = "dist"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 4193

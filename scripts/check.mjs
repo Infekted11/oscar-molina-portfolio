@@ -1,0 +1,46 @@
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { resolve, relative, dirname } from 'node:path';
+
+const root = resolve('dist');
+async function walk(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  return (await Promise.all(entries.map(e => e.isDirectory() ? walk(resolve(dir, e.name)) : resolve(dir, e.name)))).flat();
+}
+const files = await walk(root);
+const htmlFiles = files.filter(file => file.endsWith('.html'));
+let links = 0;
+const errors = [];
+for (const file of htmlFiles) {
+  const html = await readFile(file, 'utf8');
+  const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
+  if ((markup.match(/<h1[ >]/g) || []).length !== 1) errors.push(`${relative(root, file)}: expected one h1`);
+  if (!markup.includes('<html lang="en">')) errors.push(`${file}: missing language`);
+  for (const mount of ['/', '/oscar-molina-portfolio/']) {
+    const pagePath = relative(root, file).replace(/index\.html$/, '');
+    const pageURL = new URL(mount + pagePath, 'https://portfolio.test');
+    for (const [, attr, value] of markup.matchAll(/\b(href|src)="([^"]*)"/g)) {
+      if (/^(mailto:|https?:|data:)/.test(value)) continue;
+      const url = new URL(value, pageURL);
+      if (!url.pathname.startsWith(mount)) { errors.push(`${file}: link escapes Pages base: ${value}`); continue; }
+      let target = resolve(root, decodeURIComponent(url.pathname.slice(mount.length)));
+      try {
+        if ((await stat(target)).isDirectory()) target = resolve(target, 'index.html');
+        await stat(target);
+        if (attr === 'href' && url.hash && target.endsWith('.html')) {
+          const targetHTML = await readFile(target, 'utf8');
+          if (!targetHTML.includes(`id="${decodeURIComponent(url.hash.slice(1))}"`)) errors.push(`${relative(root, file)}: missing anchor ${value}`);
+        }
+        links++;
+      } catch { errors.push(`${relative(root, file)}: missing ${value} (${relative(root, target)})`); }
+    }
+  }
+}
+const home = await readFile(resolve(root, 'index.html'), 'utf8');
+if ((home.match(/data-panel="/g) || []).length !== 5) errors.push('Expected exactly five home panels');
+if ((home.match(/class="panel-dot /g) || []).length !== 5) errors.push('Expected five panel indicators');
+for (const slug of ['graphic-design', 'photo-and-film', 'design-and-build']) {
+  const project = await readFile(resolve(root, 'works', slug, 'index.html'), 'utf8');
+  if (!project.includes('Placeholder project')) errors.push(`${slug}: missing placeholder disclosure`);
+}
+if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
+console.log(`Checked ${htmlFiles.length} pages and ${links} local references at domain-root and GitHub Pages subpaths. All passed.`);

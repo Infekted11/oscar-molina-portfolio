@@ -1,0 +1,62 @@
+import { readFile, writeFile, mkdir, cp, rm } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const escape = (text = '') => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const icons = {
+  home: '<path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/>',
+  about: '<circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+  works: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  contact: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>'
+};
+const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+
+export async function build(directory = 'dist') {
+  const c = JSON.parse(await readFile(resolve(root, 'src/content.json'), 'utf8'));
+  const out = resolve(root, directory);
+  await rm(out, { recursive: true, force: true });
+  await mkdir(out, { recursive: true });
+  await cp(resolve(root, 'src/assets'), resolve(out, 'assets'), { recursive: true });
+  for (const file of ['style.css', 'app.js']) await cp(resolve(root, 'src', file), resolve(out, file));
+  await writeFile(resolve(out, '.nojekyll'), '');
+
+  function graphic(p, prefix) {
+    return `<div class="project-art art-${p.kind}" aria-hidden="true"><span class="art-label">${escape(p.category)}</span>${p.kind === 'design' ? `<span class="poster-type">MAKE<br>YOUR<br>MARK.</span><img class="poster-mark" src="${prefix}assets/mark.svg" alt="">` : p.kind === 'photo' ? '<span class="viewfinder"><i></i><i></i><i></i><i></i><span class="lens"></span></span><span class="photo-type">IN<br>FOCUS.</span>' : '<span class="build-grid"></span><span class="cube"><i></i><i></i><i></i></span><span class="build-type">IDEA<br>TO OBJECT.</span>'}<span class="art-caption">Portfolio preview · placeholder</span></div>`;
+  }
+  function card(p, prefix) {
+    return `<a class="project-card" href="${prefix}works/${p.slug}/">${graphic(p, prefix)}<span class="project-caption"><span><strong>${escape(p.title)}</strong><small>${escape(p.category)}</small></span><span class="card-plus" aria-hidden="true">+</span></span><span class="sr-only"> — placeholder project</span></a>`;
+  }
+  const mark = (prefix, cls = '') => `<img class="${cls}" src="${prefix}assets/mark.svg" alt="" aria-hidden="true">`;
+  function footer(prefix, full = false) {
+    return `<${full ? 'section' : 'footer'} id="contact" class="${full ? 'panel contact-panel' : 'page-footer'}" ${full ? 'data-panel="Contact" aria-labelledby="contact-title"' : ''}><div class="contact-content"><h${full ? '2' : '2'} id="contact-title" class="contact-title">CONTACT.</h2><a class="email-link" href="mailto:${escape(c.email)}">${escape(c.email)}</a></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${escape(c.name)}</span><a href="${prefix}about/">About me</a><a href="${full ? '#intro' : '#top'}">Back to top</a></div></${full ? 'section' : 'footer'}>`;
+  }
+  function shell({ path = '', title, body, page = 'home', panels = [] }) {
+    const depth = path.split('/').filter(Boolean).length;
+    const prefix = '../'.repeat(depth) || './';
+    const nav = [['home', 'Home', prefix], ['about', 'About me', `${prefix}about/`], ['works', 'Works', `${prefix}works/`], ['contact', 'Contact', '#contact']];
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#fa382b"><meta name="description" content="Oscar Molina — student, designer, and hands-on maker. Photography, video, graphic design, CAD, and fabrication."><title>${escape(title)} — ${escape(c.name)}</title><link rel="icon" href="${prefix}assets/mark.svg" type="image/svg+xml"><link rel="preload" href="${prefix}assets/coluna-rounded.otf" as="font" type="font/otf" crossorigin><link rel="stylesheet" href="${prefix}style.css"><script src="${prefix}app.js" defer></script></head><body class="${page === 'home' ? 'reel-page' : 'inner-page'}" data-page="${page}"><a class="skip-link" href="#main">Skip to content</a><header class="masthead"><a class="brand" href="${prefix}" aria-label="${escape(c.name)} home">${mark(prefix)}<span>Oscar Molina</span></a><span class="masthead-title">${page === 'home' ? 'Personal portfolio' : page === 'about' ? 'About me' : 'Selected work'}</span></header><nav class="side-nav" aria-label="Main navigation"><button class="menu-toggle" aria-expanded="false" aria-label="Expand menu"><span></span><span></span></button><div class="nav-links">${nav.map(([id, label, href]) => `<a class="nav-link" href="${href}" aria-label="${label}" ${page === id || (page === 'project' && id === 'works') ? 'aria-current="page"' : ''}>${icon(id)}<span>${label}</span></a>`).join('')}</div></nav>${panels.length ? `<nav class="panel-tracker" aria-label="Page panels"><div class="panel-dots">${panels.map(([id, label], i) => `<a href="#${id}" class="panel-dot ${i === 0 ? 'is-active' : ''}" aria-label="${label}" ${i === 0 ? 'aria-current="step"' : ''}><span>${label}</span><i></i></a>`).join('')}</div><div class="panel-counter" aria-hidden="true"><span data-current-panel>01</span><span class="counter-line"></span><span>${String(panels.length).padStart(2, '0')}</span></div></nav>` : ''}<main id="main" tabindex="-1" ${page === 'home' ? 'class="reel" aria-label="Portfolio panels"' : ''}>${body}</main><div class="sr-only" role="status" aria-live="polite" data-panel-status></div></body></html>`;
+  }
+  const home = `<section id="intro" class="panel hero-panel" data-panel="Introduction" aria-labelledby="hero-title"><div class="hero-main"><h1 id="hero-title" class="hero-title"><span>OSCAR</span><span>MOLINA<span class="title-period">.</span></span></h1><div class="hero-aside"><div class="hero-sticker">${mark('./')}</div><p>Photography & video<br>Graphic design<br>CAD & fabrication</p></div></div><div class="panel-baseline"><span>Student & designer</span><a href="#about">Scroll to explore<span class="scroll-cue" aria-hidden="true"><i></i></span></a></div></section>
+  <section id="about" class="panel about-panel" data-panel="About me" aria-labelledby="about-title"><div class="about-art" aria-hidden="true"><div class="letter-tile tile-o"><img src="./assets/letter-o.svg" alt=""></div><div class="letter-tile tile-m"><img src="./assets/letter-m.svg" alt=""></div></div><div class="about-copy"><h2 id="about-title" class="section-title">ABOUT<br>ME.</h2><p>${escape(c.intro)}</p><a class="text-link" href="./about/">More about me <span aria-hidden="true">+</span></a></div></section>
+  <section id="skills" class="panel skills-panel" data-panel="My skills" aria-labelledby="skills-title"><div class="skills-heading"><h2 id="skills-title" class="section-title">MY<br>SKILLS.</h2></div><div class="skill-list">${c.skills.map((s, i) => `<details class="skill" ${i === 0 ? 'open' : ''}><summary><span>${escape(s.title)}</span><span class="detail-plus" aria-hidden="true">+</span></summary><div class="skill-body"><p>${escape(s.description)}</p><span>${escape(s.tools)}</span></div></details>`).join('')}</div></section>
+  <section id="work" class="panel work-panel" data-panel="Recent work" aria-labelledby="work-title"><div class="section-heading"><h2 id="work-title" class="section-title">RECENT WORK.</h2><a class="text-link" href="./works/">All work <span aria-hidden="true">+</span></a></div><div class="project-grid">${c.projects.map(p => card(p, './')).join('')}</div><p class="work-note">Placeholder projects. Full work coming soon.</p></section>${footer('./', true)}`;
+  const pages = [{ path: '', title: 'Portfolio', page: 'home', body: home, panels: [['intro', 'Introduction'], ['about', 'About me'], ['skills', 'My skills'], ['work', 'Recent work'], ['contact', 'Contact']] }];
+  pages.push({ path: 'about', title: 'About me', page: 'about', body: `<div id="top" class="page-wrap"><div class="page-heading"><h1>ABOUT<br>ME<span>.</span></h1><div class="page-lead"><p>${escape(c.bio)}</p><a class="text-link" href="#experience">My experience <span aria-hidden="true">+</span></a></div></div><section class="about-profile" aria-label="Background"><div class="profile-symbol">${mark('../')}</div><div><h2>EDUCATION.</h2><p>I’m working toward my high school diploma, with an expected graduation in 2028. Alongside AP and honors classes, I’ve explored design and drawing for production and taken a lead role in robot design with FIRST Robotics Team 3950.</p><p>My work also includes the team’s social media and brand, event photography, and helping newer members get started in the workshop.</p></div></section><section id="experience" class="experience-section"><h2 class="section-title">EXPERIENCE.</h2><div class="experience-list">${c.experience.map(e => `<article><h3>${escape(e.title)}</h3><div><span class="experience-role">${escape(e.role)}</span><p>${escape(e.description)}</p></div></article>`).join('')}</div></section><section class="about-skills"><h2 class="section-title">SKILLS.</h2><div class="about-skill-grid">${c.skills.map(s => `<article><h3>${escape(s.title)}</h3><p>${escape(s.description)}</p><span>${escape(s.tools)}</span></article>`).join('')}</div></section></div>${footer('../')}` });
+  pages.push({ path: 'works', title: 'Works', page: 'works', body: `<div id="top" class="page-wrap works-wrap"><div class="page-heading"><h1>SELECTED<br>WORK<span>.</span></h1><div class="page-lead"><p>Photography, graphic design,<br>and fabrication.</p><p class="muted">Placeholder projects. Full work coming soon.</p></div></div><div class="work-filters" role="group" aria-label="Filter projects"><button class="filter is-active" data-filter="all" aria-pressed="true">All work</button><button class="filter" data-filter="design" aria-pressed="false">Graphic design</button><button class="filter" data-filter="photo" aria-pressed="false">Photo & film</button><button class="filter" data-filter="build" aria-pressed="false">Design & build</button></div><p class="sr-only" role="status" data-filter-status></p><div class="project-grid works-grid">${c.projects.map(p => `<div data-category="${p.kind}">${card(p, '../')}<p class="project-description">${escape(p.description)}</p></div>`).join('')}</div></div>${footer('../')}` });
+  c.projects.forEach((p, i) => {
+    const next = c.projects[(i + 1) % c.projects.length];
+    pages.push({ path: `works/${p.slug}`, title: p.title, page: 'project', body: `<div id="top" class="page-wrap project-wrap"><a class="text-link back-link" href="../">All work</a><div class="project-heading"><h1>${escape(p.title).toUpperCase()}<span>.</span></h1><div class="project-meta"><span>${escape(p.category)}</span><span class="placeholder-tag">Placeholder project</span></div></div>${graphic(p, '../../')}<section class="project-story"><h2>PROJECT DETAILS.</h2><div><p>${escape(p.summary)}</p><p class="muted">Placeholder artwork. Real project images will replace it.</p></div></section><a class="next-project" href="../${next.slug}/"><span>Next project</span><strong>${escape(next.title)}</strong><span aria-hidden="true">+</span></a></div>${footer('../../')}` });
+  });
+  pages.push({ path: '404', title: 'Page not found', page: 'error', body: '<div id="top" class="page-wrap error-page"><h1>PAGE NOT<br>FOUND.</h1><p>This page isn’t here. Use the menu to get back to the portfolio.</p></div>' + footer('./') });
+  for (const p of pages) {
+    const file = p.path === '404' ? resolve(out, '404.html') : resolve(out, p.path, 'index.html');
+    await mkdir(dirname(file), { recursive: true });
+    // The 404 may be served at any depth. Derive links from the repository base.
+    let html = shell(p);
+    if (p.path === '404') html = html.replace('<head>', `<head><script>const parts=location.pathname.split('/');const base=parts[1]==='oscar-molina-portfolio'?'/oscar-molina-portfolio/':'/';document.write('<base href="'+base+'">');</script>`).replaceAll('../', './');
+    await writeFile(file, html);
+  }
+  console.log(`Built ${pages.length} pages in ${directory}/`);
+}
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await build();
