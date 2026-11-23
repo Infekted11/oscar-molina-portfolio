@@ -9,6 +9,7 @@ menuToggle?.addEventListener('click', () => {
   const expanded = menu.classList.toggle('is-expanded');
   menuToggle.setAttribute('aria-expanded', String(expanded));
   menuToggle.setAttribute('aria-label', expanded ? 'Collapse menu' : 'Expand menu');
+  if (!expanded) menuToggle.blur();
 });
 document.addEventListener('pointerdown', event => { if (!menu.contains(event.target)) closeMenu(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') { closeMenu(); menuToggle.blur(); } });

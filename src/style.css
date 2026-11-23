@@ -95,7 +95,7 @@ main:focus{outline:none}
 .section-heading .text-link{white-space:nowrap}
 .project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .project-card{display:block;min-width:0}
-.project-art{position:relative;aspect-ratio:4/4.8;overflow:hidden;border-radius:4px;isolation:isolate;transition:transform .35s;display:flex;align-items:center;justify-content:center}
+.project-art{position:relative;width:100%;aspect-ratio:4/4.8;overflow:hidden;border-radius:4px;isolation:isolate;transition:transform .35s;display:flex;align-items:center;justify-content:center}
 .project-card:hover .project-art{transform:translateY(-6px)}
 .project-caption{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:16px 0}
 .project-caption strong{display:block;font-size:18px;font-weight:500;letter-spacing:-.025em}
@@ -140,7 +140,7 @@ main:focus{outline:none}
 .page-lead p{font-size:clamp(17px,1.7vw,24px);line-height:1.5;max-width:510px;letter-spacing:-.025em}
 .page-lead .text-link{margin-top:25px}
 .page-lead .muted{font-size:15px;margin-top:20px}
-.muted{opacity:.7}
+.muted{opacity:1}
 .about-profile{display:grid;grid-template-columns:1fr 1.1fr;gap:7vw;align-items:center;padding:55px 0 85px;border-top:1px solid var(--line)}
 .profile-symbol{background:var(--paper);aspect-ratio:1.25;border-radius:5px;display:grid;place-items:center;transform:rotate(-5deg);width:85%;margin-left:5%}
 .profile-symbol img{width:60%}
@@ -197,4 +197,7 @@ main:focus{outline:none}
 @media(max-width:370px){:root{--gutter:72px;--right:35px}.brand span{font-size:12px}.masthead-title{display:none}.hero-title{font-size:29vw}.hero-sticker{width:82px}.hero-sticker span{font-size:6px}.hero-aside p{font-size:13px}.panel-baseline>span{max-width:75px}.panel-baseline{font-size:10px}.about-art{height:135px;min-height:135px;width:170px}.about-copy p{font-size:14px}.skill summary{font-size:17px}.skills-heading p{font-size:11px}.skill-body p{font-size:13px}.skills-panel{gap:23px}}
 @media(max-height:740px) and (min-width:701px){.masthead{height:75px}.panel{padding-top:90px;padding-bottom:30px}.hero-title{font-size:min(20vw,37vh)}.hero-sticker{width:min(16vw,25vh)}.hero-aside{gap:25px}.hero-panel{padding-bottom:25px}.section-title{font-size:min(8.5vw,15vh)}.about-copy .section-title{font-size:min(7.8vw,14vh)}.about-copy p{font-size:16px;margin-top:18px}.work-panel{gap:18px}.work-panel .section-title{font-size:12vh}.work-panel .project-art{aspect-ratio:1/1.08;max-height:45vh}.work-note{margin-top:-12px}.contact-title{font-size:34vh}}
 @media(max-height:700px) and (max-width:700px){.panel{min-height:100svh;padding-top:85px;padding-bottom:25px}.hero-title{font-size:min(29vw,24vh)}.hero-main{gap:22px}.hero-sticker{width:75px;gap:10px}.hero-sticker span{font-size:6px}.hero-aside{gap:12px}.hero-aside p{font-size:13px}.about-panel{gap:24px}.about-art{height:110px;min-height:110px;width:150px}.about-copy .section-title{font-size:8.5vw}.about-copy p{font-size:14px;margin-top:15px}.skills-heading .section-title{font-size:10vw}.skills-panel{gap:25px}.skill summary{padding:14px 0}.skill-body p{font-size:13px}.skill-body>span{font-size:11px}.contact-title{font-size:23vw}}
+@media(max-width:700px){.work-panel .project-grid{grid-template-columns:1fr;gap:12px}.work-panel .project-card{display:grid;grid-template-columns:80px 1fr;gap:14px;align-items:center}.work-panel .project-art{aspect-ratio:1;height:90px;width:80px}.work-panel .project-caption{padding:0;gap:10px}.work-panel .project-caption strong{font-size:16px}.work-panel .project-caption small{display:block;font-size:11px;line-height:1.4}.work-panel .poster-type{font-size:25px;top:24%}.work-panel .photo-type{font-size:23px;bottom:20%}.work-panel .build-type{font-size:20px;bottom:17%}.work-panel .art-caption{display:none}.work-panel .cube{width:35%;top:23%;left:50%}.work-panel .viewfinder{inset:10% 15% 30%}.work-panel .lens{width:55%}.work-panel .lens::after{font-size:13px}.work-panel .lens::before{display:none}.work-panel .card-plus{display:grid;width:25px;height:25px;font-size:19px}.work-note{max-width:none}.contact-title{font-size:clamp(65px,20vw,130px)}}
+@media(max-width:370px){.page-heading h1{font-size:24vw}}
+@media(hover:none){.side-nav:hover{width:48px}.side-nav.is-expanded,.side-nav:focus-within{width:158px}}
 @media(prefers-reduced-motion:reduce){html,.reel{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}

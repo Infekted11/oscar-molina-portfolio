@@ -22,7 +22,7 @@ export async function build(directory = 'dist') {
   await writeFile(resolve(out, '.nojekyll'), '');
 
   function graphic(p, prefix) {
-    return `<div class="project-art art-${p.kind}" aria-hidden="true"><span class="art-label">${escape(p.category)}</span>${p.kind === 'design' ? `<span class="poster-type">MAKE<br>YOUR<br>MARK.</span><img class="poster-mark" src="${prefix}assets/mark.svg" alt="">` : p.kind === 'photo' ? '<span class="viewfinder"><i></i><i></i><i></i><i></i><span class="lens"></span></span><span class="photo-type">IN<br>FOCUS.</span>' : '<span class="build-grid"></span><span class="cube"><i></i><i></i><i></i></span><span class="build-type">IDEA<br>TO OBJECT.</span>'}<span class="art-caption">Portfolio preview · placeholder</span></div>`;
+    return `<div class="project-art art-${p.kind}" aria-hidden="true"><span class="art-label">${escape(p.category)}</span>${p.kind === 'design' ? `<span class="poster-type">GRAPHIC<br>DESIGN.</span><img class="poster-mark" src="${prefix}assets/mark.svg" alt="">` : p.kind === 'photo' ? '<span class="viewfinder"><i></i><i></i><i></i><i></i><span class="lens"></span></span><span class="photo-type">PHOTO<br>&amp; FILM.</span>' : '<span class="build-grid"></span><span class="cube"><i></i><i></i><i></i></span><span class="build-type">DESIGN<br>&amp; BUILD.</span>'}<span class="art-caption">Portfolio preview · placeholder</span></div>`;
   }
   function card(p, prefix) {
     return `<a class="project-card" href="${prefix}works/${p.slug}/">${graphic(p, prefix)}<span class="project-caption"><span><strong>${escape(p.title)}</strong><small>${escape(p.category)}</small></span><span class="card-plus" aria-hidden="true">+</span></span><span class="sr-only"> — placeholder project</span></a>`;
