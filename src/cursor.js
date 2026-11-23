@@ -1,4 +1,11 @@
 (() => {
+  const settings = Object.freeze({
+    densityDiffusion: 4,
+    velocityDiffusion: 4,
+    pressure: .13,
+    vorticity: 0,
+    splatRadius: .21
+  });
   const pointer = matchMedia('(hover: hover) and (pointer: fine)');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let canvas, gl, programs, velocity, dye, pressure, curl, divergence;
@@ -21,7 +28,7 @@
     splat: `vec2 p=uv-point;p.x*=aspect;float s=exp(-dot(p,p)/radius);
       result=texture(source,uv)+vec4(force,amount,0.)*s;`,
     advect: `vec2 p=uv-dt*texture(flow,uv).xy;
-      result=texture(source,p)*exp(-decay*dt);`,
+      result=texture(source,p)/(1.+decay*dt);`,
     curl: `float l=texture(source,uv-vec2(texel.x,0)).y;
       float r=texture(source,uv+vec2(texel.x,0)).y;
       float b=texture(source,uv-vec2(0,texel.y)).x;
@@ -32,13 +39,14 @@
       float b=abs(texture(auxiliary,uv-vec2(0,texel.y)).x);
       float t=abs(texture(auxiliary,uv+vec2(0,texel.y)).x);
       float c=texture(auxiliary,uv).x;
-      vec2 f=vec2(t-b,r-l);f/=length(f)+.0001;f*=c*28.;f.y*=-1.;
+      vec2 f=vec2(t-b,r-l);f/=length(f)+.0001;f*=c*amount;f.y*=-1.;
       result=vec4(clamp(texture(source,uv).xy+f*dt,vec2(-4),vec2(4)),0,1);`,
     divergence: `vec2 l=texture(source,uv-vec2(texel.x,0)).xy;
       vec2 r=texture(source,uv+vec2(texel.x,0)).xy;
       vec2 b=texture(source,uv-vec2(0,texel.y)).xy;
       vec2 t=texture(source,uv+vec2(0,texel.y)).xy;
       result=vec4(.5*(r.x-l.x+t.y-b.y),0,0,1);`,
+    dampen: `result=texture(source,uv)*amount;`,
     pressure: `float l=texture(source,uv-vec2(texel.x,0)).x;
       float r=texture(source,uv+vec2(texel.x,0)).x;
       float b=texture(source,uv-vec2(0,texel.y)).x;
@@ -140,17 +148,22 @@
   function tick(now) {
     frame=0;if(!enabled() || now>activeUntil){clear();return;}
     const dt=Math.min((now-clock)/1000,.025);clock=now;
+    // The radius control uses percentage-style units, as in the reference.
+    const radius=settings.splatRadius/100;
     for(const s of queue){
-      draw('splat',velocity.write,{source:velocity.read},{point:s.point,force:s.force,radius:.0012,amount:0});velocity.swap();
-      draw('splat',dye.write,{source:dye.read},{point:s.point,force:[0,0],radius:.00085,amount:1.2});dye.swap();
+      draw('splat',velocity.write,{source:velocity.read},{point:s.point,force:s.force,radius,amount:0});velocity.swap();
+      draw('splat',dye.write,{source:dye.read},{point:s.point,force:[0,0],radius,amount:1.2});dye.swap();
     }queue=[];
-    draw('curl',curl,{source:velocity.read});
-    draw('vortex',velocity.write,{source:velocity.read,auxiliary:curl},{dt});velocity.swap();
+    if(settings.vorticity>0){
+      draw('curl',curl,{source:velocity.read});
+      draw('vortex',velocity.write,{source:velocity.read,auxiliary:curl},{dt,amount:settings.vorticity});velocity.swap();
+    }
     draw('divergence',divergence,{source:velocity.read});
+    draw('dampen',pressure.write,{source:pressure.read},{amount:settings.pressure});pressure.swap();
     for(let i=0;i<14;i++){draw('pressure',pressure.write,{source:pressure.read,auxiliary:divergence});pressure.swap();}
     draw('project',velocity.write,{source:velocity.read,auxiliary:pressure.read});velocity.swap();
-    draw('advect',velocity.write,{source:velocity.read,flow:velocity.read},{dt,decay:1.6});velocity.swap();
-    draw('advect',dye.write,{source:dye.read,flow:velocity.read},{dt,decay:2.1});dye.swap();
+    draw('advect',velocity.write,{source:velocity.read,flow:velocity.read},{dt,decay:settings.velocityDiffusion});velocity.swap();
+    draw('advect',dye.write,{source:dye.read,flow:velocity.read},{dt,decay:settings.densityDiffusion});dye.swap();
     draw('display',null,{source:dye.read},{ink:color});
     frame=requestAnimationFrame(tick);
   }
