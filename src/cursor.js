@@ -1,6 +1,6 @@
 (() => {
   const settings = Object.freeze({
-    densityDiffusion: 4,
+    densityDiffusion: 8,
     velocityDiffusion: 4,
     pressure: .13,
     vorticity: 0,
@@ -182,7 +182,7 @@
     const steps=Math.min(6,Math.ceil(Math.hypot(dx*innerWidth,dy*innerHeight)/12));
     for(let i=1;i<=steps;i++)queue.push({point:[last.x+dx*i/steps,last.y+dy*i/steps],force});
     if(queue.length>6)queue=queue.slice(-6);
-    last={x,y,time:now};activeUntil=now+2600;
+    last={x,y,time:now};activeUntil=now+900;
     if(!frame){clock=now;frame=requestAnimationFrame(tick);}
   },{passive:true});
   document.documentElement.addEventListener('pointerleave',()=>{last=null;});
