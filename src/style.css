@@ -263,3 +263,5 @@ main:focus{outline:none}
 :root[data-theme="dark"] .theme-moon{display:none}
 :root[data-theme="dark"] .theme-sun{display:block}
 @media(max-width:700px){.theme-toggle{right:12px}}
+
+.social-link{margin-top:16px;min-height:44px}

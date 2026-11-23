@@ -34,7 +34,7 @@ export async function build(directory = 'dist') {
   }
   const mark = (prefix, cls = '') => `<img class="${cls}" src="${prefix}assets/mark.svg" alt="" aria-hidden="true">`;
   function footer(prefix, full = false) {
-    return `<${full ? 'section' : 'footer'} id="contact" class="${full ? 'panel contact-panel' : 'page-footer'}" ${full ? 'data-panel="Contact" aria-labelledby="contact-title"' : ''}><div class="contact-content"><h${full ? '2' : '2'} id="contact-title" class="contact-title">CONTACT.</h2><a class="email-link" href="mailto:${escape(c.email)}">${escape(c.email)}</a></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${escape(c.name)}</span><a href="${prefix}about/">About me</a><a href="${full ? '#intro' : '#top'}">Back to top</a></div></${full ? 'section' : 'footer'}>`;
+    return `<${full ? 'section' : 'footer'} id="contact" class="${full ? 'panel contact-panel' : 'page-footer'}" ${full ? 'data-panel="Contact" aria-labelledby="contact-title"' : ''}><div class="contact-content"><h${full ? '2' : '2'} id="contact-title" class="contact-title">CONTACT.</h2><a class="email-link" href="mailto:${escape(c.email)}">${escape(c.email)}</a><a class="text-link social-link" href="${escape(c.linkedin)}" target="_blank" rel="noopener noreferrer">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${escape(c.name)}</span><a href="${prefix}about/">About me</a><a href="${full ? '#intro' : '#top'}">Back to top</a></div></${full ? 'section' : 'footer'}>`;
   }
   function shell({ path = '', title, body, page = 'home', panels = [] }) {
     const depth = path.split('/').filter(Boolean).length;
