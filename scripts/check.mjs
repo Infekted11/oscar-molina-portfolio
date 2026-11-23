@@ -25,6 +25,7 @@ for (const file of htmlFiles) {
     for (const [, attr, value] of markup.matchAll(/\b(href|src)="([^"]*)"/g)) {
       if (/^(mailto:|https?:|data:)/.test(value)) continue;
       const url = new URL(value, pageURL);
+      if (attr === 'href' && !value.startsWith('#') && url.pathname.endsWith('/') && !url.searchParams.has('v')) errors.push(`${file}: unversioned page navigation ${value}`);
       if (!url.pathname.startsWith(mount)) { errors.push(`${file}: link escapes Pages base: ${value}`); continue; }
       let target = resolve(root, decodeURIComponent(url.pathname.slice(mount.length)));
       try {

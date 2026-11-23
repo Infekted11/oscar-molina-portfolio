@@ -1,19 +1,35 @@
 const menu = document.querySelector('.side-nav');
-const menuToggle = document.querySelector('.menu-toggle');
-const closeMenu = () => {
-  menu.classList.remove('is-expanded');
-  menuToggle.setAttribute('aria-expanded', 'false');
-  menuToggle.setAttribute('aria-label', 'Expand menu');
+const menuToggle = document.querySelector('.nav-reveal');
+let keyboardNavigation = false;
+const setMenuVisible = visible => {
+  menu.classList.toggle('is-visible', visible);
+  menuToggle.setAttribute('aria-expanded', String(visible));
+  menuToggle.setAttribute('aria-label', visible ? 'Hide navigation' : 'Show navigation');
 };
-menuToggle?.addEventListener('click', () => {
-  const expanded = menu.classList.toggle('is-expanded');
-  menuToggle.setAttribute('aria-expanded', String(expanded));
-  menuToggle.setAttribute('aria-label', expanded ? 'Collapse menu' : 'Expand menu');
-  if (!expanded) menuToggle.blur();
+const hasKeyboardFocus = () => keyboardNavigation && menu.contains(document.activeElement);
+menuToggle.addEventListener('click', () => setMenuVisible(!menu.classList.contains('is-visible')));
+document.addEventListener('pointermove', event => {
+  if (event.pointerType === 'touch') return;
+  if (event.clientX <= 80) setMenuVisible(true);
+  else if (event.clientX > menu.getBoundingClientRect().right + 32 && !hasKeyboardFocus()) setMenuVisible(false);
+}, { passive: true });
+document.addEventListener('pointerdown', event => {
+  keyboardNavigation = false;
+  if (!menu.contains(event.target) && !menuToggle.contains(event.target)) setMenuVisible(false);
 });
-document.addEventListener('pointerdown', event => { if (!menu.contains(event.target)) closeMenu(); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape') { closeMenu(); menuToggle.blur(); } });
-document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', closeMenu));
+document.addEventListener('focusin', event => {
+  if (menu.contains(event.target)) setMenuVisible(true);
+  else if (!menuToggle.contains(event.target)) setMenuVisible(false);
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Tab') keyboardNavigation = true;
+  if (event.key === 'Escape') {
+    if (menu.contains(document.activeElement)) document.activeElement.blur();
+    setMenuVisible(false);
+  }
+});
+document.documentElement.addEventListener('pointerleave', () => { if (!hasKeyboardFocus()) setMenuVisible(false); });
+document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => setMenuVisible(false)));
 
 const reel = document.querySelector('.reel');
 if (reel) {
@@ -38,6 +54,10 @@ if (reel) {
         dot.classList.toggle('is-active', i === active);
         if (i === active) dot.setAttribute('aria-current', 'step');
         else dot.removeAttribute('aria-current');
+      });
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const selected = panels[active].id === 'contact' ? link.getAttribute('href') === '#contact' : link.getAttribute('aria-current') === 'page';
+        link.classList.toggle('is-selected', selected);
       });
       counter.textContent = String(active + 1).padStart(2, '0');
       status.textContent = `${panels[active].dataset.panel}, panel ${active + 1} of ${panels.length}`;
