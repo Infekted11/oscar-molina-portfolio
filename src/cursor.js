@@ -4,7 +4,9 @@
     velocityDiffusion: 4,
     pressure: .13,
     vorticity: 0,
-    splatRadius: .21
+    splatRadius: .21,
+    pixelSize: 10,
+    inkColor: '#8d2c25'
   });
   const pointer = matchMedia('(hover: hover) and (pointer: fine)');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -20,8 +22,8 @@
     precision highp float;
     in vec2 uv;out vec4 result;
     uniform sampler2D source, flow, auxiliary;
-    uniform vec2 texel, point, force;
-    uniform float dt, decay, aspect, radius, amount;
+    uniform vec2 texel, point, force, viewportSize;
+    uniform float dt, decay, aspect, radius, amount, pixelSize;
     uniform vec3 ink;
   `;
   const fragments = {
@@ -57,9 +59,11 @@
       float b=texture(auxiliary,uv-vec2(0,texel.y)).x;
       float t=texture(auxiliary,uv+vec2(0,texel.y)).x;
       result=vec4(texture(source,uv).xy-.5*vec2(r-l,t-b),0,1);`,
-    display: `float density=max(texture(source,uv).z,0.);
-      float alpha=(1.-exp(-density*1.6))*.88;
-      result=vec4(ink,alpha);`
+    display: `vec2 pixel=vec2(uv.x*viewportSize.x,(1.-uv.y)*viewportSize.y);
+      vec2 center=(floor(pixel/pixelSize)+.5)*pixelSize;
+      vec2 sampleUv=vec2(center.x/viewportSize.x,1.-center.y/viewportSize.y);
+      float density=texture(source,sampleUv).z;
+      result=vec4(ink,step(.12,density));`
   };
   function compile(type, source) {
     const shader = gl.createShader(type);
@@ -74,7 +78,7 @@
     gl.deleteShader(v);gl.deleteShader(f);
     if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
     const uniforms = {};
-    for (const name of ['source','flow','auxiliary','texel','point','force','dt','decay','aspect','radius','amount','ink']) uniforms[name] = gl.getUniformLocation(p, name);
+    for (const name of ['source','flow','auxiliary','texel','point','force','dt','decay','aspect','radius','amount','ink','viewportSize','pixelSize']) uniforms[name] = gl.getUniformLocation(p, name);
     return { p, uniforms };
   }
   function target(width, height) {
@@ -107,7 +111,7 @@
     velocity=pair(w,h);pressure=pair(w,h);curl=target(w,h);divergence=target(w,h);dye=pair(dw,dh);
   }
   function palette() {
-    const hex=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim().replace('#','');
+    const hex=settings.inkColor.replace('#','');
     color=[0,2,4].map(i=>parseInt(hex.slice(i,i+2),16)/255);clear();
   }
   function configure() {
@@ -164,7 +168,7 @@
     draw('project',velocity.write,{source:velocity.read,auxiliary:pressure.read});velocity.swap();
     draw('advect',velocity.write,{source:velocity.read,flow:velocity.read},{dt,decay:settings.velocityDiffusion});velocity.swap();
     draw('advect',dye.write,{source:dye.read,flow:velocity.read},{dt,decay:settings.densityDiffusion});dye.swap();
-    draw('display',null,{source:dye.read},{ink:color});
+    draw('display',null,{source:dye.read},{ink:color,viewportSize:[innerWidth,innerHeight],pixelSize:settings.pixelSize});
     frame=requestAnimationFrame(tick);
   }
   document.addEventListener('pointermove',event=>{
