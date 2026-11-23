@@ -36,10 +36,26 @@
     ctx.fillRect(0, 0, innerWidth, innerHeight);
     columns = Math.ceil(innerWidth / pixelSize);
     cells = Array.from({ length: columns * Math.ceil(innerHeight / pixelSize) }, (_, i) => i);
-    for (let i = cells.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [cells[i], cells[j]] = [cells[j], cells[i]];
-    }
+    // Smooth random fields keep neighbouring pixels together in organic clumps.
+    const rows = Math.ceil(innerHeight / pixelSize);
+    const field = scale => {
+      const width = Math.ceil(columns / scale) + 2;
+      const values = Array.from({ length: width * (Math.ceil(rows / scale) + 2) }, () => Math.random());
+      const smooth = value => value * value * (3 - 2 * value);
+      return (x, y) => {
+        x /= scale; y /= scale;
+        const ix = Math.floor(x), iy = Math.floor(y), tx = smooth(x - ix), ty = smooth(y - iy);
+        const a = values[iy * width + ix], b = values[iy * width + ix + 1];
+        const c = values[(iy + 1) * width + ix], d = values[(iy + 1) * width + ix + 1];
+        return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty;
+      };
+    };
+    const broad = field(8), detail = field(4);
+    const scores = cells.map(cell => {
+      const x = cell % columns, y = Math.floor(cell / columns);
+      return broad(x, y) * .8 + detail(x, y) * .2;
+    });
+    cells.sort((a, b) => scores[a] - scores[b]);
     cleared = 0;
     if (startTime !== null) erase(Math.min(1, (performance.now() - startTime) / duration));
     overlay.style.background = 'transparent';
