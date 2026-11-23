@@ -36,11 +36,9 @@ for (const file of htmlFiles) {
   }
 }
 const home = await readFile(resolve(root, 'index.html'), 'utf8');
-if ((home.match(/data-panel="/g) || []).length !== 5) errors.push('Expected exactly five home panels');
-if ((home.match(/class="panel-dot /g) || []).length !== 5) errors.push('Expected five panel indicators');
-for (const slug of ['graphic-design', 'photo-and-film', 'design-and-build']) {
-  const project = await readFile(resolve(root, 'works', slug, 'index.html'), 'utf8');
-  if (!project.includes('Placeholder project')) errors.push(`${slug}: missing placeholder disclosure`);
-}
+if ((home.match(/data-panel="/g) || []).length !== 4) errors.push('Expected exactly four home panels');
+if ((home.match(/class="panel-dot /g) || []).length !== 4) errors.push('Expected four panel indicators');
+if (home.includes('Recent work') || home.includes('project-card')) errors.push('Home still contains recent work');
+if (files.some(file => /works\/(graphic-design|photo-and-film|design-and-build)\//.test(file))) errors.push('Placeholder project pages still exist');
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 console.log(`Checked ${htmlFiles.length} pages and ${links} local references at domain-root and GitHub Pages subpaths. All passed.`);

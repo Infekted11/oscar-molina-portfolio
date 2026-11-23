@@ -46,30 +46,5 @@
       "description": "Four years with Troop 195, with merit badges in areas including first aid, cooking, graphic arts, emergency preparedness, and entrepreneurship."
     }
   ],
-  "projects": [
-    {
-      "slug": "graphic-design",
-      "title": "Graphic design",
-      "category": "Visual identity & print",
-      "kind": "design",
-      "description": "Project selection coming soon.",
-      "summary": "Project details and images coming soon."
-    },
-    {
-      "slug": "photo-and-film",
-      "title": "Photo & film",
-      "category": "Photography & video",
-      "kind": "photo",
-      "description": "Project selection coming soon.",
-      "summary": "Project details and images coming soon."
-    },
-    {
-      "slug": "design-and-build",
-      "title": "Design & build",
-      "category": "CAD & fabrication",
-      "kind": "build",
-      "description": "Project selection coming soon.",
-      "summary": "Project details and images coming soon."
-    }
-  ]
+  "projects": []
 }
