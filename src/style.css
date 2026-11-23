@@ -215,6 +215,34 @@ main:focus{outline:none}
 @media(max-width:700px) and (max-height:700px){.about-symbol{width:110px}.education-copy{font-size:14px}.education-content{gap:22px}.experience-panel .skill-body p{font-size:13px}}
 @media(prefers-reduced-motion:reduce){html,.reel{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 
-.nav-reveal{position:fixed;z-index:31;top:50%;left:0;transform:translateY(-50%);width:12px;height:76px;border:0;border-radius:0 6px 6px 0;background:var(--ink);opacity:0;pointer-events:none}
+.nav-reveal{position:fixed;z-index:31;top:calc(50% - 128px);left:12px;transform:translateY(-50%);width:44px;height:44px;padding:12px;border:0;border-radius:50%;background:var(--ink);color:var(--paper);opacity:0;pointer-events:none;touch-action:manipulation}
+.nav-reveal svg{width:20px;height:20px}
 .nav-reveal:focus-visible{opacity:1;pointer-events:auto;outline-color:var(--ink)}
-@media(hover:none),(pointer:coarse){.nav-reveal{opacity:1;pointer-events:auto}}
+@media(max-width:700px),(hover:none),(pointer:coarse){.nav-reveal{opacity:1;pointer-events:auto}}
+
+@media(max-width:700px){
+  :root{--gutter:64px;--right:64px}
+  .masthead{justify-content:center}
+  .masthead-title{display:none}
+  .panel{text-align:center}
+  .hero-main{align-items:center;gap:24px}
+  .hero-title{margin-left:0}
+  .hero-aside{flex-direction:column;justify-content:center;gap:18px}
+  .hero-sticker{order:0}
+  .hero-aside p{width:auto;text-align:center}
+  .panel-baseline{justify-content:center;flex-wrap:wrap;text-align:center;gap:12px 22px}
+  .panel-baseline>span{max-width:none}
+  .about-copy .section-title{font-size:clamp(44px,10vw,76px)}
+  .about-copy p,.page-lead p{margin-inline:auto}
+  .page-heading{justify-items:center;width:100%}
+  .skills-heading{display:block;text-align:center}
+  .skill summary{position:relative;padding-inline:26px;justify-content:center;text-align:center}
+  .skill summary>span:first-child{flex:1}
+  .detail-plus{position:absolute;right:0;top:50%;translate:0 -50%}
+  .skill-body{padding-right:0;text-align:center}
+  .contact-content{align-items:center}
+  .footer-bottom{flex-direction:column;align-items:center;text-align:center}
+  .education-copy,.experience-panel .skill-body{margin-inline:auto}
+}
+@media(max-width:370px){:root{--gutter:52px;--right:52px}}
+@media(max-width:700px) and (max-height:700px){.hero-main{gap:18px}.hero-aside{gap:12px}}

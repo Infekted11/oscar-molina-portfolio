@@ -1,5 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { resolve, relative, dirname } from 'node:path';
+import './check-menu.mjs';
 
 const root = resolve('dist');
 async function walk(dir) {

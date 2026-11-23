@@ -1,6 +1,7 @@
 const menu = document.querySelector('.side-nav');
 const menuToggle = document.querySelector('.nav-reveal');
 let keyboardNavigation = false;
+const usesTapNavigation = () => matchMedia('(max-width:700px), (hover:none), (pointer:coarse)').matches;
 const setMenuVisible = visible => {
   menu.classList.toggle('is-visible', visible);
   menuToggle.setAttribute('aria-expanded', String(visible));
@@ -9,7 +10,7 @@ const setMenuVisible = visible => {
 const hasKeyboardFocus = () => keyboardNavigation && menu.contains(document.activeElement);
 menuToggle.addEventListener('click', () => setMenuVisible(!menu.classList.contains('is-visible')));
 document.addEventListener('pointermove', event => {
-  if (event.pointerType === 'touch') return;
+  if (event.pointerType === 'touch' || usesTapNavigation()) return;
   if (event.clientX <= 80) setMenuVisible(true);
   else if (event.clientX > menu.getBoundingClientRect().right + 32 && !hasKeyboardFocus()) setMenuVisible(false);
 }, { passive: true });
@@ -28,7 +29,9 @@ document.addEventListener('keydown', event => {
     setMenuVisible(false);
   }
 });
-document.documentElement.addEventListener('pointerleave', () => { if (!hasKeyboardFocus()) setMenuVisible(false); });
+document.documentElement.addEventListener('pointerleave', event => {
+  if (event.pointerType !== 'touch' && !usesTapNavigation() && !hasKeyboardFocus()) setMenuVisible(false);
+});
 document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => setMenuVisible(false)));
 
 const reel = document.querySelector('.reel');
