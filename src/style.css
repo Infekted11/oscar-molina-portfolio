@@ -269,8 +269,16 @@ main:focus{outline:none}
 .work-list{display:flex;flex-direction:column;align-items:flex-start;gap:20px}.project-domain{font-size:14px!important;margin-top:18px;overflow-wrap:anywhere}@media(max-width:700px){.work-list{align-items:center}}
 
 .work-preview-card{display:block;width:100%;max-width:320px}
-.work-preview-card img{width:100%;height:auto;border:1px solid var(--ink);border-radius:4px;background:var(--paper)}
+.work-preview-card img{width:100%;height:auto;border:1px solid var(--ink);border-radius:22px;background:var(--paper)}
 .work-preview-label{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0;border-bottom:1px solid var(--ink);font-size:18px}
 .work-preview-label>span:last-child{font-size:24px;line-height:1}
 .page-lead .project-summary{font-size:18px;line-height:1.6;margin-bottom:20px}
 @media(max-width:700px){.work-preview-card{max-width:280px}.page-lead .project-summary{font-size:16px}}
+
+.site-preview-panel{height:100svh;min-height:480px;justify-content:flex-start;gap:18px;padding-top:100px;padding-bottom:36px}
+.site-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;flex-shrink:0}
+.site-preview-heading h2{font-size:clamp(38px,5vw,72px)}
+.site-preview-heading .text-link{white-space:nowrap}
+.site-preview-frame{display:block;width:100%;flex:1;min-height:0;border:1px solid var(--ink);border-radius:22px;background:var(--paper)}
+.site-preview-note{font-size:13px;line-height:1.5;flex-shrink:0}
+@media(max-width:700px){.site-preview-panel{min-height:520px;padding:85px 44px 30px;gap:14px}.site-preview-heading{flex-direction:column;gap:8px}.site-preview-heading h2{font-size:38px}.site-preview-note{font-size:12px}}

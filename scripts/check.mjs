@@ -46,5 +46,11 @@ if ((home.match(/data-panel="/g) || []).length !== 4) errors.push('Expected exac
 if ((home.match(/class="panel-dot /g) || []).length !== 4) errors.push('Expected four panel indicators');
 if (home.includes('Recent work') || home.includes('project-card')) errors.push('Home still contains recent work');
 if (files.some(file => /works\/(graphic-design|photo-and-film|design-and-build)\//.test(file))) errors.push('Placeholder project pages still exist');
+const projects = JSON.parse(await readFile(resolve('src/content.json'), 'utf8')).projects;
+for (const project of projects) {
+  if (!project.url || !(['website', 'web', 'web-app', 'webapp'].includes(project.type) || /web|browser/i.test(project.category || ''))) continue;
+  const page = await readFile(resolve(root, 'works', project.slug, 'index.html'), 'utf8');
+  if (!page.includes('id="preview"') || !page.includes('<iframe') || !page.includes(`src="${project.url}"`)) errors.push(`${project.slug}: missing live preview panel`);
+}
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 console.log(`Checked ${htmlFiles.length} pages and ${links} local references at domain-root and GitHub Pages subpaths. All passed.`);
