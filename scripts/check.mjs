@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { resolve, relative, dirname } from 'node:path';
 import './check-menu.mjs';
 import './check-cursor.mjs';
+import './check-reveal.mjs';
 
 const root = resolve('dist');
 async function walk(dir) {
@@ -17,6 +18,7 @@ for (const file of htmlFiles) {
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
   if ((markup.match(/<h1[ >]/g) || []).length !== 1) errors.push(`${relative(root, file)}: expected one h1`);
   if (!markup.includes('<html lang="en">')) errors.push(`${file}: missing language`);
+  if (!markup.includes('class="load-overlay"') || !html.includes('reveal.js?v=')) errors.push(`${file}: missing loading reveal`);
   const panelCount = (markup.match(/data-panel="/g) || []).length;
   const indicatorCount = (markup.match(/class="panel-dot /g) || []).length;
   if (!markup.includes('class="reel"') || !panelCount || panelCount !== indicatorCount) errors.push(`${file}: missing snap container or mismatched panel navigation`);
