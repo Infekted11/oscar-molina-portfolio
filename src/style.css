@@ -282,3 +282,11 @@ main:focus{outline:none}
 .site-preview-frame{display:block;width:100%;flex:1;min-height:0;border:1px solid var(--ink);border-radius:22px;background:var(--paper)}
 .site-preview-note{font-size:13px;line-height:1.5;flex-shrink:0}
 @media(max-width:700px){.site-preview-panel{min-height:520px;padding:85px 44px 30px;gap:14px}.site-preview-heading{flex-direction:column;gap:8px}.site-preview-heading h2{font-size:38px}.site-preview-note{font-size:12px}}
+
+.nav-reveal .nav-chevron{display:none}
+@media(min-width:701px) and (hover:hover) and (pointer:fine){
+  .nav-reveal{top:50%;left:2px;width:24px;height:44px;transform:translateY(-50%);padding:6px;border-radius:0;background:transparent;color:var(--ink);opacity:.7;pointer-events:auto}
+  .nav-reveal .nav-hamburger{display:none}
+  .nav-reveal .nav-chevron{display:block;width:12px;height:20px}
+  .nav-reveal[aria-expanded="true"]{opacity:0;pointer-events:none}
+}

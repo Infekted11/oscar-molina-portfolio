@@ -23,7 +23,7 @@ const setMenuVisible = visible => {
   menuToggle.setAttribute('aria-label', visible ? 'Hide navigation' : 'Show navigation');
 };
 const hasKeyboardFocus = () => keyboardNavigation && menu.contains(document.activeElement);
-menuToggle.addEventListener('click', () => setMenuVisible(!menu.classList.contains('is-visible')));
+menuToggle.addEventListener('click', () => setMenuVisible(usesTapNavigation() ? !menu.classList.contains('is-visible') : true));
 document.addEventListener('pointermove', event => {
   if (event.pointerType === 'touch' || usesTapNavigation()) return;
   if (event.clientX <= 80) setMenuVisible(true);
