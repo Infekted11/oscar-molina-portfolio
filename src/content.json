@@ -55,6 +55,55 @@
       "description": "A website for Arts Angels at North Shore, featuring events, membership information, and ways to support fine and performing arts across the school district.",
       "preview": "arts-angels-preview.jpg",
       "type": "website"
+    },
+    {
+      "slug": "stillnote",
+      "title": "Stillnote",
+      "category": "Desktop app & website",
+      "type": "desktop-app",
+      "url": "https://infekted11.github.io/Stillnote/",
+      "previewUrl": "https://infekted11.github.io/Stillnote/",
+      "description": "A local-first desktop workspace for macOS and Windows. Stillnote brings Markdown notes, visual canvases, spreadsheets, Gantt charts, and linked files into one app, with optional AI assistance and Google Tasks integration. Your work stays in folders you control.",
+      "preview": "stillnote-preview.jpg",
+      "previewWidth": 1440,
+      "previewHeight": 900,
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/Infekted11/Stillnote"
+        },
+        {
+          "label": "Downloads",
+          "url": "https://github.com/Infekted11/Stillnote/releases/latest"
+        },
+        {
+          "label": "Documentation",
+          "url": "https://infekted11.github.io/Stillnote/docs.html"
+        },
+        {
+          "label": "Website source",
+          "url": "https://github.com/Infekted11/Stillnote/tree/master/Stillnote-site"
+        }
+      ],
+      "details": [
+        {
+          "title": "Notes that stay yours",
+          "description": "Open a folder as a vault and write in ordinary Markdown files. The editor renders formatting as you work, saves changes automatically, and links notes to files, headings, or exact lines. Your notes remain readable outside Stillnote."
+        },
+        {
+          "title": "More than a text editor",
+          "description": "Arrange text and images on visual canvases, calculate in spreadsheets, and plan work with Gantt charts. Bring graphs, geometry, 3D models, PDFs, and media into the same workspace, with linked previews inside notes."
+        },
+        {
+          "title": "Optional connections",
+          "description": "Sync task sheets with Google Tasks and explore math with Desmos. Connect your own AI provider to ask about notes and linked files or request edits. AI sends relevant content to the selected provider when used; file storage stays local."
+        },
+        {
+          "title": "Built for the desktop",
+          "description": "Built with Electron, JavaScript, Vite, and CodeMirror 6, with Three.js for 3D views. The project includes macOS and Windows installers, GitHub Actions release workflows, and a companion website with an interactive app demo, documentation, and changelog."
+        }
+      ],
+      "tools": "Electron · JavaScript · Vite · CodeMirror 6 · Three.js"
     }
   ],
   "linkedin": "https://www.linkedin.com/in/oscar-molina-4a17a7447/"

@@ -1,3 +1,5 @@
+import './check-panel-art.mjs';
+import './check-fluid-behavior.mjs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { resolve, relative, dirname } from 'node:path';
 import './check-menu.mjs';
@@ -51,9 +53,10 @@ if (home.includes('Recent work') || home.includes('project-card')) errors.push('
 if (files.some(file => /works\/(graphic-design|photo-and-film|design-and-build)\//.test(file))) errors.push('Placeholder project pages still exist');
 const projects = JSON.parse(await readFile(resolve('src/content.json'), 'utf8')).projects;
 for (const project of projects) {
-  if (!project.url || !(['website', 'web', 'web-app', 'webapp'].includes(project.type) || /web|browser/i.test(project.category || ''))) continue;
+  const previewUrl = project.previewUrl || project.url;
+  if (!project.previewUrl && (!project.url || !(['website', 'web', 'web-app', 'webapp'].includes(project.type) || /web|browser/i.test(project.category || '')))) continue;
   const page = await readFile(resolve(root, 'works', project.slug, 'index.html'), 'utf8');
-  if (!page.includes('id="preview"') || !page.includes('<iframe') || !page.includes(`src="${project.url}"`)) errors.push(`${project.slug}: missing live preview panel`);
+  if (!page.includes('id="preview"') || !page.includes('<iframe') || !page.includes(`src="${previewUrl}"`)) errors.push(`${project.slug}: missing live preview panel`);
 }
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
 console.log(`Checked ${htmlFiles.length} pages and ${links} local references at domain-root and GitHub Pages subpaths. All passed.`);

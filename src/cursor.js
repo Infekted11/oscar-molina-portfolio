@@ -1,6 +1,6 @@
 (() => {
   const settings = Object.freeze({
-    densityDiffusion: 8,
+    densityDiffusion: 3,
     velocityDiffusion: 4,
     pressure: .13,
     vorticity: 0,
@@ -13,6 +13,7 @@
   let canvas, gl, programs, velocity, dye, pressure, curl, divergence;
   let frame = 0, clock = 0, activeUntil = 0, last = null, queue = [], color = [0, 0, 0], failed = false;
   const targets = [];
+  let densityBound = 0;
   const enabled = () => pointer.matches && !motion.matches && !document.hidden && !failed;
   const vertex = `#version 300 es
     layout(location=0) in vec2 position;
@@ -30,7 +31,10 @@
     splat: `vec2 p=uv-point;p.x*=aspect;float s=exp(-dot(p,p)/radius);
       result=texture(source,uv)+vec4(force,amount,0.)*s;`,
     advect: `vec2 p=uv-dt*texture(flow,uv).xy;
-      result=texture(source,p)/(1.+decay*dt);`,
+      // Outside the simulation is empty, rather than a repeated border pixel.
+      vec4 transported=vec4(0.);
+      if(all(greaterThanEqual(p,vec2(0.))) && all(lessThanEqual(p,vec2(1.)))) transported=texture(source,p);
+      result=transported*exp(-decay*dt);`,
     curl: `float l=texture(source,uv-vec2(texel.x,0)).y;
       float r=texture(source,uv+vec2(texel.x,0)).y;
       float b=texture(source,uv-vec2(0,texel.y)).x;
@@ -63,7 +67,8 @@
       vec2 center=(floor(pixel/pixelSize)+.5)*pixelSize;
       vec2 sampleUv=vec2(center.x/viewportSize.x,1.-center.y/viewportSize.y);
       float density=texture(source,sampleUv).z;
-      result=vec4(ink,step(.12,density));`
+      float grain=fract(sin(dot(floor(center/pixelSize),vec2(127.1,311.7)))*43758.5453);
+      result=vec4(ink,step(.12+.12*grain,density));`
   };
   function compile(type, source) {
     const shader = gl.createShader(type);
@@ -95,7 +100,7 @@
   }
   const pair = (w,h) => ({ read:target(w,h), write:target(w,h), swap(){[this.read,this.write]=[this.write,this.read];} });
   function clear() {
-    cancelAnimationFrame(frame);frame=0;queue=[];last=null;
+    cancelAnimationFrame(frame);frame=0;queue=[];last=null;densityBound=0;
     if (!gl || gl.isContextLost()) return;
     for (const t of targets) {gl.bindFramebuffer(gl.FRAMEBUFFER,t.buffer);gl.clear(gl.COLOR_BUFFER_BIT);}
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.clear(gl.COLOR_BUFFER_BIT);
@@ -150,13 +155,14 @@
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
   }
   function tick(now) {
-    frame=0;if(!enabled() || now>activeUntil){clear();return;}
+    frame=0;if(!enabled()){clear();return;}
+    if(now>activeUntil && queue.length===0 && densityBound<.12){clear();return;}
     const dt=Math.min((now-clock)/1000,.025);clock=now;
     // The radius control uses percentage-style units, as in the reference.
     const radius=settings.splatRadius/100;
     for(const s of queue){
       draw('splat',velocity.write,{source:velocity.read},{point:s.point,force:s.force,radius,amount:0});velocity.swap();
-      draw('splat',dye.write,{source:dye.read},{point:s.point,force:[0,0],radius,amount:1.2});dye.swap();
+      draw('splat',dye.write,{source:dye.read},{point:s.point,force:[0,0],radius,amount:1.2});dye.swap();densityBound+=1.2;
     }queue=[];
     if(settings.vorticity>0){
       draw('curl',curl,{source:velocity.read});
@@ -168,6 +174,7 @@
     draw('project',velocity.write,{source:velocity.read,auxiliary:pressure.read});velocity.swap();
     draw('advect',velocity.write,{source:velocity.read,flow:velocity.read},{dt,decay:settings.velocityDiffusion});velocity.swap();
     draw('advect',dye.write,{source:dye.read,flow:velocity.read},{dt,decay:settings.densityDiffusion});dye.swap();
+    densityBound*=Math.exp(-settings.densityDiffusion*dt);
     draw('display',null,{source:dye.read},{ink:color,viewportSize:[innerWidth,innerHeight],pixelSize:settings.pixelSize});
     frame=requestAnimationFrame(tick);
   }
