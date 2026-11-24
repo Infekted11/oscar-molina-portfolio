@@ -49,7 +49,8 @@ for (const file of htmlFiles) {
 const home = await readFile(resolve(root, 'index.html'), 'utf8');
 if ((home.match(/data-panel="/g) || []).length !== 4) errors.push('Expected exactly four home panels');
 if ((home.match(/class="panel-dot /g) || []).length !== 4) errors.push('Expected four panel indicators');
-if (home.includes('Recent work') || home.includes('project-card')) errors.push('Home still contains recent work');
+if (home.includes('project-card')) errors.push('Home contains obsolete placeholder project cards');
+if (!home.includes('class="about-work"')) errors.push('Home About panel is missing selected project cards');
 if (files.some(file => /works\/(graphic-design|photo-and-film|design-and-build)\//.test(file))) errors.push('Placeholder project pages still exist');
 const projects = JSON.parse(await readFile(resolve('src/content.json'), 'utf8')).projects;
 for (const project of projects) {
